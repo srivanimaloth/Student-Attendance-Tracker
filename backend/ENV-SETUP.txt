@@ -1,0 +1,6 @@
+1. Rename nothing: edit the existing backend/.env file.
+2. Replace the Supabase URL and service-role key with values from your own Supabase project.
+3. Set a unique ADMIN_PASSWORD with at least 12 characters.
+4. Generate SESSION_SECRET by running:
+   node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+5. Never commit backend/.env. It is excluded by .gitignore.

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="A simple student attendance tracker for college projects.">
+  <title>Student Attendance Tracker</title>
+  <link rel="stylesheet" href="/styles.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <div id="loginView" class="login-shell">
+    <section class="login-card">
+      <div class="brand-mark">AT</div>
+      <p class="eyebrow">COLLEGE ADMIN TOOL</p>
+      <h1>Student Attendance Tracker</h1>
+      <p class="muted">Sign in to manage students and daily attendance.</p>
+      <form id="loginForm">
+        <label for="password">Admin password</label>
+        <input id="password" name="password" type="password" autocomplete="current-password" required>
+        <button class="button primary full" type="submit">Sign in</button>
+        <p id="loginMessage" class="form-message" role="status"></p>
+      </form>
+      <p class="small muted">Set ADMIN_PASSWORD in backend/.env before signing in.</p>
+    </section>
+  </div>
+
+  <div id="appView" class="app-shell hidden">
+    <aside class="sidebar">
+      <div class="brand-row"><div class="brand-mark small-mark">AT</div><div><strong>AttendTrack</strong><span>Student attendance</span></div></div>
+      <nav aria-label="Main navigation">
+        <button class="nav-item active" data-view="dashboard"><span>▦</span> Dashboard</button>
+        <button class="nav-item" data-view="students"><span>♙</span> Students</button>
+        <button class="nav-item" data-view="attendance"><span>✓</span> Mark attendance</button>
+        <button class="nav-item" data-view="records"><span>▤</span> Attendance records</button>
+      </nav>
+      <div class="sidebar-bottom"><div class="admin-chip"><div class="avatar">A</div><div><strong>Administrator</strong><span>Local project account</span></div></div><button id="logoutButton" class="button ghost full">Sign out</button></div>
+    </aside>
+
+    <main class="main-content">
+      <header class="topbar"><div><p class="eyebrow" id="pageEyebrow">OVERVIEW</p><h1 id="pageTitle">Dashboard</h1></div><div class="topbar-actions"><span id="todayLabel" class="date-pill"></span><button id="refreshButton" class="button secondary">Refresh</button></div></header>
+      <div id="notice" class="notice hidden" role="status"></div>
+
+      <section id="dashboardView" class="page-view">
+        <div class="welcome-card"><div><p class="eyebrow light">ATTENDANCE OVERVIEW</p><h2>Good day, Administrator</h2><p>Keep student attendance organised in one place.</p></div><div class="welcome-icon">✓</div></div>
+        <div class="stats-grid">
+          <article class="stat-card"><div class="stat-icon violet">♙</div><p>Total students</p><strong id="statStudents">—</strong><span>Registered students</span></article>
+          <article class="stat-card"><div class="stat-icon green">✓</div><p>Present today</p><strong id="statPresent">—</strong><span>Marked present</span></article>
+          <article class="stat-card"><div class="stat-icon amber">◷</div><p>Absent today</p><strong id="statAbsent">—</strong><span>Marked absent</span></article>
+          <article class="stat-card"><div class="stat-icon blue">%</div><p>Today's attendance</p><strong id="statRate">—</strong><span>Present / marked records</span></article>
+        </div>
+        <div class="content-grid">
+          <article class="panel"><div class="panel-heading"><div><h3>Today's attendance</h3><p class="muted">Latest status for each student</p></div><button class="text-button" data-goto="attendance">Mark attendance →</button></div><div id="dashboardAttendance" class="table-wrap"></div></article>
+          <article class="panel quick-panel"><h3>Quick actions</h3><p class="muted">Common tasks</p><button class="quick-action" data-goto="students"><span class="quick-icon violet">＋</span><span><strong>Add a student</strong><small>Register a student profile</small></span><span class="chevron">›</span></button><button class="quick-action" data-goto="attendance"><span class="quick-icon green">✓</span><span><strong>Mark attendance</strong><small>Record present or absent</small></span><span class="chevron">›</span></button><button class="quick-action" data-goto="records"><span class="quick-icon blue">▤</span><span><strong>View records</strong><small>Search by date or student</small></span><span class="chevron">›</span></button></article>
+        </div>
+      </section>
+
+      <section id="studentsView" class="page-view hidden">
+        <div class="section-toolbar"><div><h2>Student directory</h2><p class="muted">Add and manage student details.</p></div><button id="addStudentButton" class="button primary">＋ Add student</button></div>
+        <div class="panel"><div class="filter-row"><input id="studentSearch" type="search" placeholder="Search name, roll number or course…" aria-label="Search students"><span id="studentCount" class="muted small"></span></div><div id="studentsTable" class="table-wrap"></div></div>
+      </section>
+
+      <section id="attendanceView" class="page-view hidden">
+        <div class="section-toolbar"><div><h2>Daily attendance</h2><p class="muted">Choose a date and mark each student's status.</p></div><div class="date-control"><label for="attendanceDate">Attendance date</label><input id="attendanceDate" type="date"></div></div>
+        <div class="panel"><div class="attendance-toolbar"><div><strong id="attendanceDateHeading">Attendance</strong><p class="muted small">Changes are saved when you click Save attendance.</p></div><div class="button-row"><button id="markAllPresent" class="button secondary">Mark all present</button><button id="markAllAbsent" class="button secondary">Mark all absent</button><button id="saveAttendance" class="button primary">Save attendance</button></div></div><div id="attendanceTable" class="table-wrap"></div></div>
+      </section>
+
+      <section id="recordsView" class="page-view hidden">
+        <div class="section-toolbar"><div><h2>Attendance records</h2><p class="muted">Review previously saved attendance.</p></div></div>
+        <div class="panel"><div class="filter-row records-filters"><label>Date <input id="recordDate" type="date"></label><input id="recordSearch" type="search" placeholder="Search student…" aria-label="Search attendance records"><button id="clearRecordFilters" class="button secondary">Clear filters</button></div><div id="recordsTable" class="table-wrap"></div></div>
+      </section>
+    </main>
+  </div>
+
+  <dialog id="studentDialog" class="modal">
+    <form id="studentForm">
+      <div class="modal-heading"><div><p class="eyebrow">STUDENT DETAILS</p><h2 id="studentDialogTitle">Add student</h2></div><button type="button" class="icon-button" id="closeStudentDialog" aria-label="Close">×</button></div>
+      <input type="hidden" id="studentId">
+      <label for="studentName">Full name *</label><input id="studentName" maxlength="100" required placeholder="e.g. Asha Kumar">
+      <label for="rollNumber">Roll number *</label><input id="rollNumber" maxlength="30" required placeholder="e.g. AIML001">
+      <label for="course">Course / class</label><input id="course" maxlength="100" placeholder="e.g. B.Tech AIML">
+      <label for="email">Email (optional)</label><input id="email" type="email" maxlength="254" placeholder="student@example.com">
+      <p id="studentFormMessage" class="form-message" role="status"></p>
+      <div class="modal-actions"><button type="button" id="cancelStudentDialog" class="button secondary">Cancel</button><button class="button primary" type="submit">Save student</button></div>
+    </form>
+  </dialog>
+  <dialog id="confirmDialog" class="modal confirm-modal"><form method="dialog"><div class="modal-heading"><h2 id="confirmTitle">Please confirm</h2><button class="icon-button" aria-label="Close">×</button></div><p id="confirmText"></p><div class="modal-actions"><button value="cancel" class="button secondary">Cancel</button><button id="confirmAction" value="confirm" class="button danger">Delete</button></div></form></dialog>
+  <footer class="page-footer">Student Attendance Tracker <span>•</span> College project MVP</footer>
+</body>
+</html>
